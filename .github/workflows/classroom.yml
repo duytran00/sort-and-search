@@ -1,0 +1,130 @@
+name: Autograding Tests
+'on':
+- push
+- repository_dispatch
+permissions:
+  checks: write
+  actions: read
+  contents: read
+jobs:
+  run-autograding-tests:
+    runs-on: ubuntu-latest
+    if: github.actor != 'github-classroom[bot]'
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    - name: Sorting tobe.txt
+      id: sorting-tobe-txt
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: Sorting tobe.txt
+        setup-command: ''
+        command: python gradeSorting.py tobe.txt
+        timeout: 10
+        max-score: 5
+    - name: Sorting tobe.txt verbose
+      id: sorting-tobe-txt-verbose
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: Sorting tobe.txt verbose
+        setup-command: ''
+        command: python gradeSorting.py tobe.txt --verbose
+        timeout: 10
+        max-score: 5
+    - name: Sorting lower.txt
+      id: sorting-lower-txt
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: Sorting lower.txt
+        setup-command: ''
+        command: python gradeSorting.py lower.txt
+        timeout: 10
+        max-score: 5
+    - name: Sorting lower.txt verbose
+      id: sorting-lower-txt-verbose
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: Sorting lower.txt verbose
+        setup-command: ''
+        command: python gradeSorting.py lower.txt --verbose
+        timeout: 10
+        max-score: 5
+    - name: Sorting caps.txt
+      id: sorting-caps-txt
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: Sorting caps.txt
+        setup-command: ''
+        command: python gradeSorting.py caps.txt
+        timeout: 10
+        max-score: 5
+    - name: Sorting caps.txt verbose
+      id: sorting-caps-txt-verbose
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: Sorting caps.txt verbose
+        setup-command: ''
+        command: python gradeSorting.py caps.txt --verbose
+        timeout: 10
+        max-score: 5
+    - name: Binary Search tobe.txt
+      id: binary-search-tobe-txt
+      uses: classroom-resources/autograding-io-grader@v1
+      with:
+        test-name: Binary Search tobe.txt
+        setup-command: gcc text_indexing.c -o text-indexing
+        command: "./text-indexing 0 tobe.txt"
+        input: ''
+        expected-output: |-
+          be
+          4, 1, (2 iterations) found
+          it
+          4, 1, 2, 3, (4 iterations) not found
+          is
+          4, 1, 2, (3 iterations) found
+          that
+          4, 7, 5, 6, (4 iterations) found
+          small
+          4, 7, 5, 6, (4 iterations) not found
+          two
+          4, 7, 8, 9, (4 iterations) not found
+        comparison-method: contains
+        timeout: 10
+        max-score: 5
+    - name: Binary Search mix.txt
+      id: binary-search-mix-txt
+      uses: classroom-resources/autograding-io-grader@v1
+      with:
+        test-name: Binary Search mix.txt
+        setup-command: gcc -g text_indexing.c -o text-indexing
+        command: "./text-indexing 0 mix.txt"
+        input: ''
+        expected-output: |-
+          that
+          4, 6, 7, (3 iterations) not found
+          it
+          4, (1 iterations) found
+          is
+          4, 1, 2, 3, (4 iterations) found
+          small
+          4, 6, (2 iterations) found
+          small
+          4, 6, (2 iterations) found
+          two
+          4, 6, 7, 8, (4 iterations) found
+        comparison-method: contains
+        timeout: 10
+        max-score: 5
+    - name: Autograding Reporter
+      uses: classroom-resources/autograding-grading-reporter@v1
+      env:
+        SORTING-TOBE-TXT_RESULTS: "${{steps.sorting-tobe-txt.outputs.result}}"
+        SORTING-TOBE-TXT-VERBOSE_RESULTS: "${{steps.sorting-tobe-txt-verbose.outputs.result}}"
+        SORTING-LOWER-TXT_RESULTS: "${{steps.sorting-lower-txt.outputs.result}}"
+        SORTING-LOWER-TXT-VERBOSE_RESULTS: "${{steps.sorting-lower-txt-verbose.outputs.result}}"
+        SORTING-CAPS-TXT_RESULTS: "${{steps.sorting-caps-txt.outputs.result}}"
+        SORTING-CAPS-TXT-VERBOSE_RESULTS: "${{steps.sorting-caps-txt-verbose.outputs.result}}"
+        BINARY-SEARCH-TOBE-TXT_RESULTS: "${{steps.binary-search-tobe-txt.outputs.result}}"
+        BINARY-SEARCH-MIX-TXT_RESULTS: "${{steps.binary-search-mix-txt.outputs.result}}"
+      with:
+        runners: sorting-tobe-txt,sorting-tobe-txt-verbose,sorting-lower-txt,sorting-lower-txt-verbose,sorting-caps-txt,sorting-caps-txt-verbose,binary-search-tobe-txt,binary-search-mix-txt
